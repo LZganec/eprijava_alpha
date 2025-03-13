@@ -5,12 +5,19 @@ import MainPage from './components/MainPage.vue'
 
 <template>
   <div class="page-header">
-    <p>ePrijava</p>
-    <div class="clock">18:59</div> <!-- Add a placeholder for the clock -->
+    <p>ePrijava v0.1</p>
+    <div class="clock">18:59</div> <!-- trenutno placeholder, bum nekak namestil da sistemsko vreme gledi -->
     <img alt="HAIX logo" class="logo" src="@/assets/haixLogo.png" width="125" height="125" />
   </div>
 
   <div class="background-wrapper">
+    <div class="language-buttons">
+      <button>EN</button>
+      <button>HR</button>
+      <button>DE</button>
+      <button>FR</button>
+      <button>IT</button>
+    </div>
     <!-- </header> -->
     <MainPage msg="Test" />
     <!-- <RouterView /> -->
@@ -22,85 +29,52 @@ import MainPage from './components/MainPage.vue'
 .page-header {
   display: flex;
   flex-direction: row;
-  align-items: center; /* Center items vertically */
-  justify-content: space-around; /* Distribute space between items */
+  align-items: center; 
+  justify-content: space-around; 
 }
+
 .background-wrapper {
-  background-color: #2c3e50; /* Promijeni ovo u željenu boju pozadine */
+  background-color: #2c3e50; 
   padding: 2rem;
-  margin: 0.2vh auto; /* Centriraj kontejner vertikalno s 2.5% margine */
+  margin: 0.2vh auto; /* centriraj kontejner vertikalno i trunkicu odmakni od vrha */
   width: 96vw; /* 95% širine viewporta */
   height: 89vh; /* 95% visine viewporta */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Opcionalno: Dodaj shadow za bolju vizualnu separaciju */
-  border-radius: 20px; /* Opcionalno: Dodaj zaobljene kutove */
+  border-radius: 20px; /* zaobljeni vogli */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Dodaj shadow za bolju vizualnu separaciju */
+  /* position: relative; */ /* Ensure the language buttons are positioned relative to the container */
 }
 
 .background-wrapper * {
-  color: white; /* Promijeni ovo u željenu boju teksta */
+  color: white; /* boja teksta v kontejneru */
 }
 
+.language-buttons {
+  position: absolute;
+  top: 1rem;
+  left: 3rem;
+  display: flex;
+  gap: 0.5rem; /* Space between buttons */
+}
 
+.language-buttons button {
+  background-color: #ffffff;
+  color: #2c3e50;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.language-buttons button:hover {
+  background-color: #dddddd;
+}
 
 .logo {
-  position: absolute;
-  /* width: 10em;
-  height: 7.5em; */
-  /* margin-right: 0;  *//* Remove any right margin */
+  position: absolute; /* moral sam deti absolute jer bi drugačije vura ne bila centrirana jeba joj pas */
 }
 
 .clock {
-  /* flex-grow: 1;  */ /* Allow the clock to take up available space */
-  /* text-align: center; */ /* Center the clock text */
-  font-size: 2em; /* Increase the font size */
-  /* padding: 1rem; */ /* Add padding around the clock */
-  /* margin-left: auto; */ /* Push the clock to the center */
-  /* margin-right: auto; */ /* Push the clock to the center */;
+  font-size: 2em; 
 }
 
-/* nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-} */
-
-/* nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-} */
-
-/* @media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-} */
 </style>
