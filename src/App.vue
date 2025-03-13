@@ -1,34 +1,43 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import MainPage from './components/MainPage.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="page-header">
+    <img alt="HAIX logo" class="logo" src="@/assets/haixLogo.png" width="125" height="125" />
+    <p>dede</p>
+  </div>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div class="background-wrapper">
+    <!-- </header> -->
+    <MainPage msg="Ovo je main page." />
+    <!-- <RouterView /> -->
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.background-wrapper {
+  background-color: #f0f0f0; /* Change this to your desired background color */
+  padding: 2rem;
+  margin: 2.5vh auto; /* Center the container vertically with a 2.5% margin */
+  width: 95vw; /* 95% of the viewport width */
+  height: 95vh; /* 95% of the viewport height */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visual separation */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  overflow: auto; /* Optional: Add scroll if content overflows */
+}
+
+.page-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: -2rem;
 }
 
 .logo {
-  display: block;
-  margin: 0 auto 2rem;
+  /* display: block;
+  margin: 0 auto 2rem; */
 }
 
 nav {
