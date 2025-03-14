@@ -1,7 +1,32 @@
 {
-  "en": "Welcome to HAIX",
-  "hr": "Dobrodošli u HAIX",
-  "de": "Willkommen bei HAIX",
-  "fr": "Bienvenue chez HAIX",
-  "it": "Benvenuti a HAIX"
+  "en": {
+    "welcome": "Welcome to HAIX",
+    "signUp": "Sign Up",
+    "signIn": "Sign In",
+    "logOut": "Log Out"
+  },
+  "hr": {
+    "welcome": "Dobrodošli u HAIX",
+    "signUp": "Prijavi se",
+    "signIn": "Prijava",
+    "logOut": "Odjava"
+  },
+  "de": {
+    "welcome": "Willkommen bei HAIX",
+    "signUp": "Anmelden",
+    "signIn": "Einloggen",
+    "logOut": "Ausloggen"
+  },
+  "fr": {
+    "welcome": "Bienvenue chez HAIX",
+    "signUp": "S'inscrire",
+    "signIn": "Se connecter",
+    "logOut": "Se déconnecter"
+  },
+  "it": {
+    "welcome": "Benvenuti a HAIX",
+    "signUp": "Iscriviti",
+    "signIn": "Accedi",
+    "logOut": "Disconnettersi"
+  }
 }

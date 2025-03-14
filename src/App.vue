@@ -6,12 +6,16 @@ import translations from './assets/translations.json' // za prijevode
 
 let time = ref('')
 let welcomeMessage = ref('')
+let currentLang = ref('') // Default language is Croatian
 
+// Funkcija za promjenu jezika
 const changeLanguage = (lang) => {
-  // provjerava postoji li prijevod za zadani jezik u objektu translations
+  currentLang.value = lang
+  // Provjerava postoji li prijevod za zadani jezik u objektu translations
   if (translations[lang]) {
-    // ako postoji, postavlja vrijednost welcomeMessage na prijevod za zadani jezik
-    welcomeMessage.value = translations[lang]
+    // Ako postoji, postavlja vrijednost welcomeMessage na prijevod za zadani jezik
+    welcomeMessage.value = translations[lang].welcome
+    console.log(`Language is now set to ${lang}.`)
   }
 }
 
@@ -24,7 +28,7 @@ const updateTime = () => {
   time.value = `${hours}:${minutes}:${seconds}`
 }
 
-// pri mountanju postavlja defaultni jezik na hrvatski
+// Postavlja zadani jezik na hrvatski prilikom montiranja komponente
 onMounted(() => {
   changeLanguage('hr')
   updateTime()
@@ -37,13 +41,12 @@ onMounted(() => {
     <div class="clock">{{ time }}</div>
     <!-- trenutno placeholder, bum nekak namestil da sistemsko vreme gledi -->
     <div class="logo">
-      <!-- <img alt="HAIX icon" src="@\assets\hx_logo.png" width="50" height="50" /> -->
-      <img alt="HAIX logo" src="@\assets\haix_group_blau.png" width="300" height="69" />
+      <img alt="HAIX logo" src="@/assets/haix_group_blau.png" width="250" height="69" />
     </div>
   </div>
 
   <div class="background-wrapper">
-    <MainPage :msg="welcomeMessage" />
+    <MainPage :msg="welcomeMessage" :lang="currentLang" />
     <!-- <RouterView /> -->
   </div>
   <div class="language-buttons">
@@ -61,12 +64,12 @@ onMounted(() => {
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 0.2rem 3rem;
+  padding: 1rem 3rem;
   margin-top: 1rem;
 }
 
 .language-buttons {
-  padding-top: 0.4em;
+  padding-top: 0.1em;
   display: flex;
   gap: 3rem;
   align-items: center;
@@ -92,7 +95,7 @@ onMounted(() => {
 .logo {
   position: absolute;
   right: 3em;
-  top: 1px;
+  top: 1.5em;
   z-index: 1;
 }
 
@@ -107,7 +110,7 @@ onMounted(() => {
   padding: 1rem;
   margin: auto;
   width: 96vw;
-  height: 89vh;
+  height: 88vh;
   border-radius: 20px;
 }
 
@@ -117,7 +120,7 @@ onMounted(() => {
 </style>
 
 <style>
-body * {
+body {
   overflow: hidden;
 }
 </style>
