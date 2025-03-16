@@ -1,25 +1,25 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import MainPage from './components/MainPage.vue'
-import 'flag-icons/css/flag-icons.min.css'            // za ikone zastava
+import 'flag-icons/css/flag-icons.min.css' // za ikone zastava
 import translations from './assets/translations.json' // za prijevode
 
 let time = ref('')
 let welcomeMessage = ref('')
 let currentLang = ref('') // Default language is Croatian
 
-// Funkcija za promjenu jezika
+// funkcija za promjenu jezika
 const changeLanguage = (lang) => {
   currentLang.value = lang
-  // Provjerava postoji li prijevod za zadani jezik u objektu translations
+  // provjerava postoji li prijevod za zadani jezik u objektu translations
   if (translations[lang]) {
-    // Ako postoji, postavlja vrijednost welcomeMessage na prijevod za zadani jezik
+    // ako postoji, postavlja vrijednost welcomeMessage na prijevod za zadani jezik
     welcomeMessage.value = translations[lang].welcome
     console.log(`Language is now set to ${lang}.`)
   }
 }
 
-// Funkcija za ažuriranje vremena
+// funkcija za ažuriranje vremena
 const updateTime = () => {
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
@@ -28,11 +28,11 @@ const updateTime = () => {
   time.value = `${hours}:${minutes}:${seconds}`
 }
 
-// Postavlja zadani jezik na hrvatski prilikom montiranja komponente
+// postavlja zadani jezik na hrvatski prilikom montiranja komponente
 onMounted(() => {
   changeLanguage('hr')
   updateTime()
-  setInterval(updateTime, 1000) // Ažurira vrijeme svake sekunde
+  setInterval(updateTime, 1000) // ažurira vrijeme svake sekunde
 })
 </script>
 
@@ -41,13 +41,12 @@ onMounted(() => {
     <div class="clock">{{ time }}</div>
     <!-- trenutno placeholder, bum nekak namestil da sistemsko vreme gledi -->
     <div class="logo">
-      <img alt="HAIX logo" src="@/assets/haix_group_blau.png" width="250" height="69" />
+      <img alt="HAIX logo" src="@/assets/HAIX_group_blau.png" width="250" height="69" />
     </div>
   </div>
 
   <div class="background-wrapper">
     <MainPage :msg="welcomeMessage" :lang="currentLang" />
-    <!-- <RouterView /> -->
   </div>
   <div class="language-buttons">
     <button @click="() => changeLanguage('en')"><span class="fi fi-gb"></span> EN</button>
@@ -110,11 +109,11 @@ onMounted(() => {
   padding: 1rem;
   margin: auto;
   width: 96vw;
-  height: 88vh;
+  height: 86vh;
   border-radius: 20px;
 }
 
-.background-wrapper * {
+.background-wrapper {
   color: white;
 }
 </style>

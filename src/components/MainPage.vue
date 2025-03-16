@@ -1,6 +1,9 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import translations from '../assets/translations.json'
+import SignUp from './SignUp.vue'
+import LogIn from './LogIn.vue'
+import LogOut from './LogOut.vue'
 
 const props = defineProps({
   msg: {
@@ -12,21 +15,29 @@ const props = defineProps({
     required: true,
   },
 })
-console.log(props.lang)
+
+const currentView = ref(0) // 0: buttons, 1: SignUp, 2: LogIn, 3: LogOut
+
 const buttonLabels = computed(() => {
   return translations[props.lang] || translations['en']
 })
 
+const showView = (view) => {
+  currentView.value = view
+}
 </script>
 
 <template>
   <div class="greetings">
     <h1 class="blue">{{ msg }}</h1>
-    <div class="button-container">
-      <button>{{ buttonLabels.signUp }}</button>
-      <button>{{ buttonLabels.signIn }}</button>
-      <button>{{ buttonLabels.logOut }}</button>
+    <div class="button-container" v-if="currentView === 0">
+      <button @click="showView(1)">{{ buttonLabels.signUp }}</button>
+      <button @click="showView(2)">{{ buttonLabels.signIn }}</button>
+      <button @click="showView(3)">{{ buttonLabels.logOut }}</button>
     </div>
+    <SignUp v-else-if="currentView === 1" />
+    <LogIn v-else-if="currentView === 2" />
+    <LogOut v-else-if="currentView === 3" />
   </div>
 </template>
 
@@ -51,18 +62,19 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5rem;
-  margin-top: 7.5rem;
+  gap: 10rem;
+  margin-top: 5rem;
 }
 
 .button-container button {
-  padding: 3rem 5rem;
+  padding: 2rem 2rem;
   font-size: 2rem;
   cursor: pointer;
   border: none;
   border-radius: 10px;
   background-color: #ffffff;
   color: #2c3e50;
+  width: 25rem;
 }
 
 .button-container button:hover {
