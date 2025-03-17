@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, nextTick, computed } from 'vue'
 import translations from '../assets/translations.json'
-import registeredUsers from '../assets/registeredUsers.json'
+// import registeredUsers from '../assets/registeredUsers.json'
 
 const props = defineProps({
   lang: {
@@ -19,7 +19,7 @@ const gdprAgreement = ref(false)
 const pinCode = ref('')
 const filteredContactPersons = ref([])
 
-const contactPersons = ['Mike Hawk', 'Hugh Janus', 'Mike Oxmall', 'Munchma Kootchie']
+const contactPersons = ['Marko Brljak', 'Dominik Domjanić', 'Leon Žganec']
 
 const fullNameInput = ref(null)
 const companyNameInput = ref(null)
@@ -50,17 +50,17 @@ const handleSignUp = () => {
   console.log('PIN Code:', pinCode.value)
 
   // Save user data to registeredUsers.json
-  const newUser = {
-    fullName: fullName.value,
-    companyName: companyName.value,
-    visitPurpose: visitPurpose.value,
-    contactPerson: contactPerson.value,
-    gdprAgreement: gdprAgreement.value,
-    pinCode: pinCode.value
-  }
+  // const newUser = {
+  //   fullName: fullName.value,
+  //   companyName: companyName.value,
+  //   visitPurpose: visitPurpose.value,
+  //   contactPerson: contactPerson.value,
+  //   gdprAgreement: gdprAgreement.value,
+  //   pinCode: pinCode.value
+  // }
 
   // Add the new user to the registeredUsers array
-  registeredUsers.push(newUser)
+  // registeredUsers.push(newUser)
 
   // Save the updated registeredUsers array to the JSON file
   // const fs = require('fs')
