@@ -1,0 +1,10 @@
+[
+  {
+    "fullName": "John Doe",
+    "companyName": "Example Corp",
+    "visitPurpose": "Business Meeting",
+    "contactPerson": "Jane Smith",
+    "gdprAgreement": true,
+    "pinCode": "1234"
+  }
+]

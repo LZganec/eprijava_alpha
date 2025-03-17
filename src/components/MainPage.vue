@@ -22,6 +22,15 @@ const buttonLabels = computed(() => {
   return translations[props.lang] || translations['en']
 })
 
+const viewTitles = computed(() => {
+  return {
+    0: props.msg,
+    1: buttonLabels.value.signUp,
+    2: buttonLabels.value.signIn,
+    3: buttonLabels.value.logOut
+  }
+})
+
 const showView = (view) => {
   currentView.value = view
 }
@@ -29,13 +38,13 @@ const showView = (view) => {
 
 <template>
   <div class="greetings">
-    <h1 class="blue">{{ msg }}</h1>
+    <h1 class="blue">{{ viewTitles[currentView] }}</h1>
     <div class="button-container" v-if="currentView === 0">
       <button @click="showView(1)">{{ buttonLabels.signUp }}</button>
       <button @click="showView(2)">{{ buttonLabels.signIn }}</button>
       <button @click="showView(3)">{{ buttonLabels.logOut }}</button>
     </div>
-    <SignUp v-else-if="currentView === 1" />
+    <SignUp v-else-if="currentView === 1" :lang="lang" />
     <LogIn v-else-if="currentView === 2" />
     <LogOut v-else-if="currentView === 3" />
   </div>
@@ -47,6 +56,7 @@ h1 {
   font-size: 2.6rem;
   position: relative;
   top: -10px;
+  color: white;
 }
 
 h3 {
@@ -63,7 +73,7 @@ h3 {
   flex-direction: column;
   align-items: center;
   gap: 10rem;
-  margin-top: 5rem;
+  margin-top: 7rem;
 }
 
 .button-container button {

@@ -3,30 +3,110 @@
     "welcome": "Welcome to HAIX",
     "signUp": "Sign Up",
     "signIn": "Sign In",
-    "logOut": "Log Out"
+    "logOut": "Log Out",
+    "fullName": "Full Name",
+    "companyName": "Company Name",
+    "visitPurpose": "Purpose of Visit",
+    "contactPerson": "Contact Person",
+    "gdprAgreement": "GDPR Agreement",
+    "summary": "Summary",
+    "gdprPoints": [
+      "1. Your data will be stored securely.",
+      "2. Your data will not be shared with third parties.",
+      "3. You have the right to access and delete your data."
+    ],
+    "agreeToGdpr": "I agree to the GDPR rules",
+    "next": "Next",
+    "finish": "Finish",
+    "summaryPinCode": "PIN Code:",
+    "badgePrinting": "Your badge is being printed..."
   },
   "hr": {
     "welcome": "Dobrodošli u HAIX",
     "signUp": "Registracija",
     "signIn": "Prijava",
-    "logOut": "Odjava"
+    "logOut": "Odjava",
+    "fullName": "Puno ime",
+    "companyName": "Naziv tvrtke",
+    "visitPurpose": "Svrha posjeta",
+    "contactPerson": "Kontakt osoba",
+    "gdprAgreement": "GDPR sporazum",
+    "summary": "Sažetak",
+    "gdprPoints": [
+      "1. Vaši podaci će biti pohranjeni sigurno.",
+      "2. Vaši podaci neće biti dijeljeni s trećim stranama.",
+      "3. Imate pravo pristupa i brisanja svojih podataka."
+    ],
+    "agreeToGdpr": "Slažem se s GDPR pravilima",
+    "next": "Dalje",
+    "finish": "Završi",
+    "summaryPinCode": "PIN kod:",
+    "badgePrinting": "Vaša oznaka se ispisuje..."
   },
   "de": {
     "welcome": "Willkommen bei HAIX",
     "signUp": "Anmelden",
     "signIn": "Einloggen",
-    "logOut": "Ausloggen"
+    "logOut": "Ausloggen",
+    "fullName": "Vollständiger Name",
+    "companyName": "Firmenname",
+    "visitPurpose": "Zweck des Besuchs",
+    "contactPerson": "Kontaktperson",
+    "gdprAgreement": "DSGVO-Vereinbarung",
+    "summary": "Zusammenfassung",
+    "gdprPoints": [
+      "1. Ihre Daten werden sicher gespeichert.",
+      "2. Ihre Daten werden nicht an Dritte weitergegeben.",
+      "3. Sie haben das Recht, auf Ihre Daten zuzugreifen und sie zu löschen."
+    ],
+    "agreeToGdpr": "Ich stimme den DSGVO-Regeln zu",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "summaryPinCode": "PIN-Code:",
+    "badgePrinting": "Ihr Abzeichen wird gedruckt..."
   },
   "fr": {
     "welcome": "Bienvenue chez HAIX",
     "signUp": "S'inscrire",
     "signIn": "Se connecter",
-    "logOut": "Se déconnecter"
+    "logOut": "Se déconnecter",
+    "fullName": "Nom complet",
+    "companyName": "Nom de l'entreprise",
+    "visitPurpose": "Objet de la visite",
+    "contactPerson": "Personne de contact",
+    "gdprAgreement": "Accord RGPD",
+    "summary": "Résumé",
+    "gdprPoints": [
+      "1. Vos données seront stockées en toute sécurité.",
+      "2. Vos données ne seront pas partagées avec des tiers.",
+      "3. Vous avez le droit d'accéder à vos données et de les supprimer."
+    ],
+    "agreeToGdpr": "J'accepte les règles RGPD",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "summaryPinCode": "Code PIN:",
+    "badgePrinting": "Votre badge est en cours d'impression..."
   },
   "it": {
     "welcome": "Benvenuti a HAIX",
     "signUp": "Iscriviti",
     "signIn": "Accedi",
-    "logOut": "Disconnettersi"
+    "logOut": "Disconnettersi",
+    "fullName": "Nome completo",
+    "companyName": "Nome dell'azienda",
+    "visitPurpose": "Scopo della visita",
+    "contactPerson": "Persona di contatto",
+    "gdprAgreement": "Accordo GDPR",
+    "summary": "Sommario",
+    "gdprPoints": [
+      "1. I tuoi dati saranno conservati in modo sicuro.",
+      "2. I tuoi dati non saranno condivisi con terze parti.",
+      "3. Hai il diritto di accedere ai tuoi dati e di eliminarli."
+    ],
+    "agreeToGdpr": "Accetto le regole GDPR",
+    "next": "Avanti",
+    "finish": "Finire",
+    "summaryPinCode": "Codice PIN:",
+    "badgePrinting": "Il tuo badge è in fase di stampa..."
   }
 }

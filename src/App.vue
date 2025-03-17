@@ -6,7 +6,7 @@ import translations from './assets/translations.json' // za prijevode
 
 let time = ref('')
 let welcomeMessage = ref('')
-let currentLang = ref('') // Default language is Croatian
+let currentLang = ref('hr') // Default language is Croatian
 
 // funkcija za promjenu jezika
 const changeLanguage = (lang) => {
@@ -41,7 +41,7 @@ onMounted(() => {
     <div class="clock">{{ time }}</div>
     <!-- trenutno placeholder, bum nekak namestil da sistemsko vreme gledi -->
     <div class="logo">
-      <img alt="HAIX logo" src="@/assets/HAIX_group_blau.png" width="250" height="69" />
+      <img alt="HAIX logo" src="@/assets/haix_group_blau.png" width="300" height="69" />
     </div>
   </div>
 
@@ -49,11 +49,16 @@ onMounted(() => {
     <MainPage :msg="welcomeMessage" :lang="currentLang" />
   </div>
   <div class="language-buttons">
-    <button @click="() => changeLanguage('en')"><span class="fi fi-gb"></span> EN</button>
-    <button @click="() => changeLanguage('hr')"><span class="fi fi-hr"></span> HR</button>
-    <button @click="() => changeLanguage('de')"><span class="fi fi-de"></span> DE</button>
-    <button @click="() => changeLanguage('fr')"><span class="fi fi-fr"></span> FR</button>
-    <button @click="() => changeLanguage('it')"><span class="fi fi-it"></span> IT</button>
+    <button :class="{ selected: currentLang === 'en' }" @click="() => changeLanguage('en')"><span
+        class="fi fi-gb"></span> EN</button>
+    <button :class="{ selected: currentLang === 'hr' }" @click="() => changeLanguage('hr')"><span
+        class="fi fi-hr"></span> HR</button>
+    <button :class="{ selected: currentLang === 'de' }" @click="() => changeLanguage('de')"><span
+        class="fi fi-de"></span> DE</button>
+    <button :class="{ selected: currentLang === 'fr' }" @click="() => changeLanguage('fr')"><span
+        class="fi fi-fr"></span> FR</button>
+    <button :class="{ selected: currentLang === 'it' }" @click="() => changeLanguage('it')"><span
+        class="fi fi-it"></span> IT</button>
   </div>
 </template>
 
@@ -63,12 +68,12 @@ onMounted(() => {
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 1rem 3rem;
+  padding: 0.2rem 3rem;
   margin-top: 1rem;
 }
 
 .language-buttons {
-  padding-top: 0.1em;
+  padding-top: 0.4em;
   display: flex;
   gap: 3rem;
   align-items: center;
@@ -85,16 +90,30 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .language-buttons button:hover {
   background-color: #dddddd;
 }
 
+.language-buttons button.selected {
+  background-color: #2c3e50;
+  color: white;
+  margin-top: -15px;
+  /* Adjust as needed to overlap with the container */
+  z-index: 2;
+  /* Ensure it appears above the container */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Optional: Add a shadow for better visibility */
+  border-radius: 0 0 5px 5px;
+}
+
 .logo {
   position: absolute;
   right: 3em;
-  top: 1.5em;
+  top: 1px;
   z-index: 1;
 }
 
@@ -109,7 +128,7 @@ onMounted(() => {
   padding: 1rem;
   margin: auto;
   width: 96vw;
-  height: 86vh;
+  height: 89vh;
   border-radius: 20px;
 }
 

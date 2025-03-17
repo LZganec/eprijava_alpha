@@ -1,5 +1,14 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
+import translations from '../assets/translations.json'
+import registeredUsers from '../assets/registeredUsers.json'
+
+const props = defineProps({
+  lang: {
+    type: String,
+    required: true,
+  },
+})
 
 const step = ref(1)
 const fullName = ref('')
@@ -10,7 +19,7 @@ const gdprAgreement = ref(false)
 const pinCode = ref('')
 const filteredContactPersons = ref([])
 
-const contactPersons = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Brown']
+const contactPersons = ['Mike Hawk', 'Hugh Janus', 'Mike Oxmall', 'Munchma Kootchie']
 
 const fullNameInput = ref(null)
 const companyNameInput = ref(null)
@@ -39,6 +48,23 @@ const handleSignUp = () => {
   console.log('Contact Person:', contactPerson.value)
   console.log('GDPR Agreement:', gdprAgreement.value)
   console.log('PIN Code:', pinCode.value)
+
+  // Save user data to registeredUsers.json
+  const newUser = {
+    fullName: fullName.value,
+    companyName: companyName.value,
+    visitPurpose: visitPurpose.value,
+    contactPerson: contactPerson.value,
+    gdprAgreement: gdprAgreement.value,
+    pinCode: pinCode.value
+  }
+
+  // Add the new user to the registeredUsers array
+  registeredUsers.push(newUser)
+
+  // Save the updated registeredUsers array to the JSON file
+  // const fs = require('fs')
+  // fs.writeFileSync('../assets/registeredUsers.json', JSON.stringify(registeredUsers, null, 2))
 }
 
 const focusInput = () => {
@@ -69,54 +95,52 @@ watch(contactPerson, (newVal) => {
     )
   }, 300) // 300ms debounce
 })
+
+const t = computed(() => translations[props.lang] || translations['en'])
 </script>
 
 <template>
   <div class="signup-container">
-    <!-- <h1>Sign Up</h1> -->
     <form @submit.prevent="nextStep">
       <div v-if="step === 1" class="form-group">
-        <label for="fullName">Full Name</label>
+        <label for="fullName">{{ t.fullName }}</label>
         <input type="text" id="fullName" v-model="fullName" ref="fullNameInput" required />
       </div>
       <div v-if="step === 2" class="form-group">
-        <label for="companyName">Company Name</label>
+        <label for="companyName">{{ t.companyName }}</label>
         <input type="text" id="companyName" v-model="companyName" ref="companyNameInput" required />
       </div>
       <div v-if="step === 3" class="form-group">
-        <label for="visitPurpose">Purpose of Visit</label>
+        <label for="visitPurpose">{{ t.visitPurpose }}</label>
         <input type="text" id="visitPurpose" v-model="visitPurpose" ref="visitPurposeInput" required />
       </div>
       <div v-if="step === 4" class="form-group">
-        <label for="contactPerson">Contact Person</label>
+        <label for="contactPerson">{{ t.contactPerson }}</label>
         <input type="text" id="contactPerson" v-model="contactPerson" ref="contactPersonInput" required />
         <ul class="dropdown" v-if="filteredContactPersons.length">
           <li v-for="person in filteredContactPersons" :key="person" @click="contactPerson = person">{{ person }}</li>
         </ul>
       </div>
       <div v-if="step === 5" class="form-group">
-        <label for="gdprAgreement">GDPR Agreement</label>
-        <textarea id="gdprAgreement" readonly>
-          Sample GDPR rules: 
-          1. Your data will be stored securely.
-          2. Your data will not be shared with third parties.
-          3. You have the right to access and delete your data.
-        </textarea>
-        <div>
+        <label for="gdprAgreement">{{ t.gdprAgreement }}</label>
+        <ul id="gdprAgreement">
+          <li v-for="(point, index) in t.gdprPoints" :key="index">{{ point }}</li>
+        </ul>
+        <div class="gdpr-agreement">
           <input type="checkbox" id="gdprAgreementCheckbox" v-model="gdprAgreement" ref="gdprAgreementInput" required />
-          <label for="gdprAgreementCheckbox">I agree to the GDPR rules</label>
+          <label for="gdprAgreementCheckbox">{{ t.agreeToGdpr }}</label>
         </div>
       </div>
       <div v-if="step === 6" class="form-group summary">
-        <h2>Summary</h2>
-        <p><strong>Full Name:</strong> {{ fullName }}</p>
-        <p><strong>Company Name:</strong> {{ companyName }}</p>
-        <p><strong>Purpose of Visit:</strong> {{ visitPurpose }}</p>
-        <p><strong>Contact Person:</strong> {{ contactPerson }}</p>
-        <p><strong>PIN Code:</strong> {{ pinCode }}</p>
-        <p>Your badge is being printed...</p>
+        <h2>{{ t.summary }}</h2>
+        <p><strong>{{ t.fullName }}</strong> {{ fullName }}</p>
+        <p><strong>{{ t.companyName }}</strong> {{ companyName }}</p>
+        <p><strong>{{ t.visitPurpose }}</strong> {{ visitPurpose }}</p>
+        <p><strong>{{ t.contactPerson }}</strong> {{ contactPerson }}</p>
+        <p><strong>{{ t.summaryPinCode }}</strong> {{ pinCode }}</p>
+        <p>{{ t.badgePrinting }}</p>
       </div>
-      <button type="submit">{{ step < 6 ? 'Next' : 'Finish' }}</button>
+      <button type="submit">{{ step < 6 ? t.next : t.finish }}</button>
     </form>
   </div>
 </template>
@@ -131,31 +155,30 @@ watch(contactPerson, (newVal) => {
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  background-color: #2c3e50; /* Same background color as the main page */
+  background-color: #2c3e50;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 600px; /* Increase the max-width for wider fields */
+  max-width: 1000px;
   margin: 2rem auto;
 }
 
 .signup-container h1 {
   font-size: 2.4rem;
   margin-bottom: 1.5rem;
-  color: white; /* Ensure the text color is visible on the dark background */
+  color: white;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
-  width: 100%;
+  width: 50rem;
 }
 
 .form-group label {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
-  color: white; /* Ensure the label color is visible on the dark background */
+  color: white;
 }
 
 .form-group input,
@@ -165,20 +188,27 @@ watch(contactPerson, (newVal) => {
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 100%; /* Make the input fields take up the full width */
-  color: black; /* Set the text color inside the fill-in fields to black */
+  width: 100%;
+  color: black;
 }
 
 textarea {
-  height: 600px; /* Increase the height of the GDPR agreement textarea */
-  width: 500px;
+  height: 450px;
+  width: 100%;
 }
 
 .summary {
-  padding: 2rem; /* Increase padding for the summary section */
+  padding: 2rem;
   background-color: #1a252f;
   border-radius: 10px;
   color: white;
+  width: 30em;
+  height: 20em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
 }
 
 ul {
@@ -195,7 +225,7 @@ ul {
 li {
   padding: 0.5rem;
   cursor: pointer;
-  color: black; /* Set the text color inside the dropdown list to black */
+  color: black;
 }
 
 li:hover {
@@ -215,5 +245,12 @@ button {
 
 button:hover {
   background-color: #1a252f;
+}
+
+.gdpr-agreement {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 1rem;
 }
 </style>
