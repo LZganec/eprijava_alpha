@@ -73,7 +73,7 @@ onMounted(() => {
 }
 
 .language-buttons {
-  padding-top: 0.4em;
+  padding-top: 0.1em;
   display: flex;
   gap: 3rem;
   align-items: center;
@@ -85,7 +85,7 @@ onMounted(() => {
   color: #2c3e50;
   border: none;
   font-size: 2.2rem;
-  border-radius: 5px;
+  border-radius: 0.2em;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -101,13 +101,10 @@ onMounted(() => {
 .language-buttons button.selected {
   background-color: #2c3e50;
   color: white;
-  margin-top: -15px;
-  /* Adjust as needed to overlap with the container */
+  margin-top: -0.5em;
   z-index: 2;
-  /* Ensure it appears above the container */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  /* Optional: Add a shadow for better visibility */
-  border-radius: 0 0 5px 5px;
+  box-shadow: 0 0.2em 0.2em rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 0.2em 0.2em;
 }
 
 .logo {
@@ -128,7 +125,7 @@ onMounted(() => {
   padding: 1rem;
   margin: auto;
   width: 96vw;
-  height: 89vh;
+  height: 87vh;
   border-radius: 20px;
 }
 

@@ -4,6 +4,7 @@ import translations from '../assets/translations.json'
 import SignUp from './SignUp.vue'
 import LogIn from './LogIn.vue'
 import LogOut from './LogOut.vue'
+// import SimpleKeyboard from './SimpleKeyboard.vue'
 
 const props = defineProps({
   msg: {
@@ -34,6 +35,22 @@ const viewTitles = computed(() => {
 const showView = (view) => {
   currentView.value = view
 }
+
+// Virtual keyboard logic
+// const input = ref('')
+
+// const onInputChange = (event) => {
+//   input.value = event.target.value
+// }
+
+// const onChange = (inputValue) => {
+//   input.value = inputValue
+//   console.log('Input changed:', inputValue)
+// }
+
+// const onKeyPress = (key) => {
+//   console.log('Key pressed:', key)
+// }
 </script>
 
 <template>
@@ -47,6 +64,10 @@ const showView = (view) => {
     <SignUp v-else-if="currentView === 1" :lang="lang" />
     <LogIn v-else-if="currentView === 2" />
     <LogOut v-else-if="currentView === 3" />
+  </div>
+  <div id="app">
+    <!-- <input :value="input" class="input" @input="onInputChange" placeholder="Tap on the virtual keyboard to start" />
+    <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" /> -->
   </div>
 </template>
 
@@ -72,7 +93,7 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rem;
+  gap: 5rem;
   margin-top: 7rem;
 }
 
@@ -89,5 +110,9 @@ h3 {
 
 .button-container button:hover {
   background-color: #ffffff;
+}
+
+.simple-keyboard {
+  max-width: 850px;
 }
 </style>
