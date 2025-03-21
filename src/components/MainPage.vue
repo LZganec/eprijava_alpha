@@ -93,7 +93,7 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5rem;
+  gap: 7.5rem;
   margin-top: 7rem;
 }
 

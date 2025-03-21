@@ -73,7 +73,7 @@ onMounted(() => {
 }
 
 .language-buttons {
-  padding-top: 0.1em;
+  padding-top: 0.4em;
   display: flex;
   gap: 3rem;
   align-items: center;
@@ -84,7 +84,7 @@ onMounted(() => {
   background-color: #ffffff;
   color: #2c3e50;
   border: none;
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   border-radius: 0.2em;
   cursor: pointer;
   display: flex;
@@ -102,6 +102,7 @@ onMounted(() => {
   background-color: #2c3e50;
   color: white;
   margin-top: -0.5em;
+  padding-bottom: 0.1em;
   z-index: 2;
   box-shadow: 0 0.2em 0.2em rgba(0, 0, 0, 0.2);
   border-radius: 0 0 0.2em 0.2em;

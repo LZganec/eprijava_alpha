@@ -267,57 +267,41 @@ button {
   margin-top: 1rem;
 }
 
-/* Adjust the keyboard container */
 .simple-keyboard {
   position: fixed;
   bottom: 5rem;
-  /* Move the keyboard lower */
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
-  /* Increase the width */
   height: 40%;
-  /* Increase the height */
   background-color: #2c3e50;
-  /* Change the background color */
-  /* border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
   padding: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-/* Customize the keyboard buttons using ::v-deep */
 ::v-deep(.hg-button) {
   background-color: #ffffff;
-  /* Button background color */
   color: #2c3e50;
-  /* Button text color */
   font-size: 2rem;
-  /* Increase button text size */
   border: none;
   border-radius: 5px;
   padding: 1.5rem 1.5rem;
-  /* Increase button size */
   margin: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-/* Change button hover effect */
+/* nepotrebno jer se za sad aplikacija planira koristiti samo na tabletu */
 ::v-deep(.hg-button:hover) {
   background-color: #2c3e50;
   color: #ffffff;
-  /* Hover background color */
 }
 
-/* Reset the active button state */
 ::v-deep(.hg-button-active) {
   background-color: #ffffff !important;
-  /* Reset to default background color */
   color: #2c3e50 !important;
-  /* Reset to default text color */
   transition: none;
 }
 </style>

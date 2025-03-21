@@ -50,9 +50,9 @@ export default {
                 ],
                 shift: [
                     "~ ! @ # $ % ^ & * ( ) _ + {bksp}",
-                    "Q W E R T Z U I O P { } |",
-                    'A S D F G H J K L : "',
-                    "{shift} Y X C V B N M < > ? {shift}",
+                    "Q W E R T Z U I O P Š Đ",
+                    'A S D F G H J K L Č Ć Ž',
+                    "{shift} Y X C V B N M ; : _ {shift}",
                     "@ {space}"
                 ]
             },
@@ -111,7 +111,7 @@ export default {
     },
     methods: {
         initKeyboard() {
-            const layout = this.layouts[this.lang] || this.layouts.en; // Fallback to English if the language is not defined
+            const layout = this.layouts[this.lang] || this.layouts.en;
             this.keyboard = new Keyboard(this.keyboardClass, {
                 onChange: this.onChange,
                 onKeyPress: this.onKeyPress,
@@ -140,7 +140,7 @@ export default {
             this.keyboard.setInput(input);
         },
         lang(newLang) {
-            // Reinitialize the keyboard when the language changes
+            // ponovno inicijalizirati tipkovnicu kada se promijeni jezik
             const layout = this.layouts[newLang] || this.layouts.en;
             this.keyboard.setOptions({
                 layout: layout
