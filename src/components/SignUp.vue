@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, nextTick, computed } from 'vue'
 import translations from '../assets/translations.json'
+import registeredCompanies from '../assets/registeredCompanies.json'; // Import the companies JSON
 import SimpleKeyboard from './SimpleKeyboard.vue'
 
 // Virtual keyboard logic
@@ -12,12 +13,41 @@ const onChange = (inputValue) => {
     fullName.value = inputValue // Sync with the fullName field
   } else if (step.value === 2) {
     companyName.value = inputValue // Sync with the companyName field
+
+    // Debounce the filtering of companies
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      filterCompanies(inputValue);
+    }, 1500); // 1.5 seconds debounce
   } else if (step.value === 3) {
     visitPurpose.value = inputValue // Sync with the visitPurpose field
   } else if (step.value === 4) {
     contactPerson.value = inputValue // Sync with the contactPerson field
   }
 }
+
+const filterCompanies = (query) => {
+  if (!query) {
+    filteredCompanies.value = [];
+    buttonVisible.value = false; // Hide the button if no query
+    return;
+  }
+
+  filteredCompanies.value = registeredCompanies.filter((company) =>
+    company.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  // Show the button if no results are found
+  buttonVisible.value = filteredCompanies.value.length === 0;
+};
+
+let selectCompany = (company) => {
+  companyName.value = company.name; // Autofill the input field
+  input.value = company.name; // Sync the virtual keyboard input
+  filteredCompanies.value = []; // Clear the suggestions
+  selectedCompany.value = company; // Mark the company as selected
+  buttonVisible.value = true; // Show the button when a company is selected
+};
 
 const onKeyPress = (key) => {
   console.log('Key pressed:', key)
@@ -38,6 +68,9 @@ const contactPerson = ref('')
 const gdprAgreement = ref(false)
 const pinCode = ref('')
 const filteredContactPersons = ref([])
+let filteredCompanies = ref([]); // Array to store filtered companies
+const selectedCompany = ref(null); // Tracks the selected company
+const buttonVisible = ref(false); // Tracks whether the button should be visible
 
 const contactPersons = ['Marko Brljak', 'Dominik Domjanić', 'Leon Žganec']
 
@@ -100,6 +133,11 @@ watch(contactPerson, (newVal) => {
 })
 
 const t = computed(() => translations[props.lang] || translations['en'])
+
+// Computed property to determine if the button should be shown
+const showButton = computed(() => {
+  return filteredCompanies.value.length === 0 || selectedCompany.value !== null;
+});
 </script>
 
 <template>
@@ -107,26 +145,39 @@ const t = computed(() => translations[props.lang] || translations['en'])
     <form @submit.prevent="nextStep">
       <div v-if="step === 1" class="form-group">
         <label class="input-label" for="fullName">{{ t.fullName }}</label>
-        <input type="text" id="fullName" v-model="fullName" ref="fullNameInput" readonly required />
+        <div class="input-button-row">
+          <input type="text" id="fullName" v-model="fullName" ref="fullNameInput" required />
+          <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
+        </div>
         <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
       </div>
       <div v-if="step === 2" class="form-group">
         <label class="input-label" for="companyName">{{ t.companyName }}</label>
         <input type="text" id="companyName" v-model="companyName" ref="companyNameInput" readonly required />
-        <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
+        <div class="company-suggestions" v-if="filteredCompanies.length">
+          <div class="company-card" v-for="company in filteredCompanies" :key="company.id"
+            @click="selectCompany(company)">
+            {{ company.name }}
+          </div>
+        </div>
+        <button class="confirm-button" type="submit" v-if="showButton">{{ step < 6 ? t.next : t.finish }}</button>
+            <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
       </div>
       <div v-if="step === 3" class="form-group">
         <label class="input-label" for="visitPurpose">{{ t.visitPurpose }}</label>
         <input type="text" id="visitPurpose" v-model="visitPurpose" ref="visitPurposeInput" readonly required />
-        <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
+        <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
+            <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
       </div>
       <div v-if="step === 4" class="form-group">
         <label class="input-label" for="contactPerson">{{ t.contactPerson }}</label>
         <input type="text" id="contactPerson" v-model="contactPerson" ref="contactPersonInput" readonly required />
-        <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
-        <ul class="dropdown" v-if="filteredContactPersons.length">
-          <li v-for="person in filteredContactPersons" :key="person" @click="contactPerson = person">{{ person }}</li>
-        </ul>
+        <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
+            <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
+            <ul class="dropdown" v-if="filteredContactPersons.length">
+              <li v-for="person in filteredContactPersons" :key="person" @click="contactPerson = person">{{ person }}
+              </li>
+            </ul>
       </div>
       <div v-if="step === 5" class="form-group">
         <label for="gdprAgreement">{{ t.gdprAgreement }}</label>
@@ -147,7 +198,7 @@ const t = computed(() => translations[props.lang] || translations['en'])
         <p><strong>{{ t.summaryPinCode }}</strong> {{ pinCode }}</p>
         <p>{{ t.badgePrinting }}</p>
       </div>
-      <button type="submit">{{ step < 6 ? t.next : t.finish }}</button>
+      <!-- <button type="submit">{{ step < 6 ? t.next : t.finish }}</button> -->
     </form>
   </div>
 </template>
@@ -161,12 +212,24 @@ const t = computed(() => translations[props.lang] || translations['en'])
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 1em;
   background-color: #2c3e50;
   border-radius: 10px;
   width: 100%;
-  max-width: 1000px;
-  margin: 2rem auto;
+  /* max-width: 1000px; */
+  margin: -2rem auto;
+}
+
+.confirm-button {
+  padding: 1.5rem 1.5rem;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  background-color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 1rem;
+  width: 15%;
 }
 
 .signup-container h1 {
@@ -178,6 +241,7 @@ const t = computed(() => translations[props.lang] || translations['en'])
 .form-group {
   display: flex;
   flex-direction: column;
+  align-items: center;
   margin-bottom: 1rem;
   width: 50rem;
 }
@@ -203,7 +267,7 @@ const t = computed(() => translations[props.lang] || translations['en'])
   font-weight: bold;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 100%;
+  width: 90%;
   color: black;
 }
 
@@ -272,10 +336,10 @@ button {
   bottom: 5rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;
-  height: 40%;
+  width: 90%;
+  height: 35%;
   background-color: #2c3e50;
-  padding: 1rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -287,7 +351,7 @@ button {
   font-size: 2rem;
   border: none;
   border-radius: 5px;
-  padding: 1.5rem 1.5rem;
+  padding: 1.75rem 1.5rem;
   margin: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -303,5 +367,74 @@ button {
   background-color: #ffffff !important;
   color: #2c3e50 !important;
   transition: none;
+}
+
+.company-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 5px;
+  max-height: 15em;
+  max-width: 90em;
+  overflow-y: auto;
+}
+
+.company-card {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 1rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.company-card:hover {
+  background-color: #2c3e50;
+  color: #ffffff;
+}
+
+.input-button-row {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  /* Align input and button vertically */
+  gap: 1rem;
+  /* Add space between the input and button */
+  width: 100%;
+  /* Ensure the row takes up the full width */
+}
+
+.input-button-row input {
+  flex: 1;
+  /* Make the input take up the remaining space */
+  padding: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: black;
+}
+
+.confirm-button {
+  flex-shrink: 0;
+  /* Prevent the button from shrinking */
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  background-color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.confirm-button:hover {
+  background-color: #ddd;
 }
 </style>

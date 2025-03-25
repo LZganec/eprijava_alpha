@@ -124,7 +124,23 @@ export default {
         onKeyPress(button) {
             this.$emit("onKeyPress", button);
 
-            if (button === "{shift}" || button === "{lock}") this.handleShift();
+            if (button === "{shift}" || button === "{lock}") {
+                this.handleShift();
+            } else {
+                // Only revert to default layout if currently in shift mode and the button is not a special key
+                if (this.keyboard.options.layoutName === "shift" && !button.startsWith("{")) {
+                    this.keyboard.setOptions({
+                        layoutName: "default"
+                    });
+                }
+            }
+
+            // Handle backspace functionality
+            if (button === "{bksp}") {
+                const currentInput = this.keyboard.getInput();
+                this.keyboard.setInput(currentInput.slice(0, -1)); // Remove the last character
+                this.$emit("onChange", this.keyboard.getInput()); // Emit the updated input
+            }
         },
         handleShift() {
             let currentLayout = this.keyboard.options.layoutName;
@@ -140,7 +156,7 @@ export default {
             this.keyboard.setInput(input);
         },
         lang(newLang) {
-            // ponovno inicijalizirati tipkovnicu kada se promijeni jezik
+            // Reinitialize the keyboard when the language changes
             const layout = this.layouts[newLang] || this.layouts.en;
             this.keyboard.setOptions({
                 layout: layout
