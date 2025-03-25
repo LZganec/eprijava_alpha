@@ -39,9 +39,8 @@ onMounted(() => {
 <template>
   <div class="page-header">
     <div class="clock">{{ time }}</div>
-    <!-- trenutno placeholder, bum nekak namestil da sistemsko vreme gledi -->
     <div class="logo">
-      <img alt="HAIX logo" src="@/assets/haix_group_blau.png" width="300" height="69" />
+      <img alt="HAIX logo" src="../src/assets/HAIX_group_blau.png" width="300" height="69" />
     </div>
   </div>
 

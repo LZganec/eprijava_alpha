@@ -1,35 +1,41 @@
 <script setup>
 import { ref, watch, nextTick, computed } from 'vue'
 import translations from '../assets/translations.json'
-import registeredCompanies from '../assets/registeredCompanies.json'; // Import the companies JSON
+import registeredCompanies from '../assets/registeredCompanies.json'; // importa registrirane tvrtke
 import SimpleKeyboard from './SimpleKeyboard.vue'
+import visitPurposes from '../assets/visitPurposes.json'
 
-// Virtual keyboard logic
-const input = ref('') // Tracks the current input value from the virtual keyboard
+// logika za virtualnu tipkovnicu
+const input = ref('') // pratimo trenutnu vrijednost inputa
 
 const onChange = (inputValue) => {
-  input.value = inputValue // Update the virtual keyboard's input value
+  input.value = inputValue // apdejta trenutnu vrijednost inputa
   if (step.value === 1) {
-    fullName.value = inputValue // Sync with the fullName field
+    fullName.value = inputValue // sinkronizira s poljem fullName
   } else if (step.value === 2) {
-    companyName.value = inputValue // Sync with the companyName field
+    companyName.value = inputValue // sinkronizira s poljem companyName
 
-    // Debounce the filtering of companies
+    // debounce za filtriranje tvrtki
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       filterCompanies(inputValue);
-    }, 1500); // 1.5 seconds debounce
+    }, 500); // 1.5 seconds debounce
   } else if (step.value === 3) {
-    visitPurpose.value = inputValue // Sync with the visitPurpose field
+    visitPurpose.value = inputValue // sinkronizira s poljem visitPurpose
+
+    // debounce za filtriranje svrha posjeta
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      filterVisitPurposes(inputValue);
+    }, 500); // 300ms debounce
   } else if (step.value === 4) {
-    contactPerson.value = inputValue // Sync with the contactPerson field
+    contactPerson.value = inputValue // sinkronizira s poljem contactPerson
   }
 }
 
 const filterCompanies = (query) => {
   if (!query) {
     filteredCompanies.value = [];
-    buttonVisible.value = false; // Hide the button if no query
     return;
   }
 
@@ -37,16 +43,31 @@ const filterCompanies = (query) => {
     company.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  // Show the button if no results are found
-  buttonVisible.value = filteredCompanies.value.length === 0;
 };
 
+const filterVisitPurposes = (query) => {
+  if (!query) {
+    filteredVisitPurposes.value = [];
+    return;
+  }
+
+  filteredVisitPurposes.value = visitPurposes.filter((purpose) =>
+    purpose[props.lang].toLowerCase().includes(query.toLowerCase())
+  );
+
+};
+
+const selectVisitPurpose = (purpose) => {
+  visitPurpose.value = purpose[props.lang] // Autofill the selected purpose
+  input.value = purpose[props.lang] // Sync with the virtual keyboard
+  filteredVisitPurposes.value = [] // Clear the filtered purposes
+}
+
 let selectCompany = (company) => {
-  companyName.value = company.name; // Autofill the input field
-  input.value = company.name; // Sync the virtual keyboard input
-  filteredCompanies.value = []; // Clear the suggestions
-  selectedCompany.value = company; // Mark the company as selected
-  buttonVisible.value = true; // Show the button when a company is selected
+  companyName.value = company.name; // autofil za odabranu tvrtku
+  input.value = company.name; // sinkronizira odabranu tvrtku s virtualnom tipkovnicom
+  filteredCompanies.value = []; // očisti filtrirane tvrtke
+  selectedCompany.value = company; // označi odabranu tvrtku
 };
 
 const onKeyPress = (key) => {
@@ -68,9 +89,9 @@ const contactPerson = ref('')
 const gdprAgreement = ref(false)
 const pinCode = ref('')
 const filteredContactPersons = ref([])
-let filteredCompanies = ref([]); // Array to store filtered companies
-const selectedCompany = ref(null); // Tracks the selected company
-const buttonVisible = ref(false); // Tracks whether the button should be visible
+let filteredCompanies = ref([]); // array za filtrirane tvrtke
+const selectedCompany = ref(null); // trenutno odabraana tvrtka
+const filteredVisitPurposes = ref([])
 
 const contactPersons = ['Marko Brljak', 'Dominik Domjanić', 'Leon Žganec']
 
@@ -88,7 +109,7 @@ const nextStep = async () => {
     }
     await nextTick()
     focusInput()
-    input.value = '' // Clear the virtual keyboard input when moving to the next step
+    input.value = '' // počisti input virtualne tipkovnice nakon svakog koraka
   } else {
     handleSignUp()
   }
@@ -121,7 +142,7 @@ const generatePinCode = () => {
   pinCode.value = Math.floor(10000 + Math.random() * 90000).toString()
 }
 
-// Watch the contactPerson input and debounce the filtering
+// pratimo promjene u inputu za contactPerson i filtriramo kontakt osobe
 let debounceTimeout
 watch(contactPerson, (newVal) => {
   clearTimeout(debounceTimeout)
@@ -134,61 +155,86 @@ watch(contactPerson, (newVal) => {
 
 const t = computed(() => translations[props.lang] || translations['en'])
 
-// Computed property to determine if the button should be shown
-const showButton = computed(() => {
-  return filteredCompanies.value.length === 0 || selectedCompany.value !== null;
-});
 </script>
 
 <template>
   <div class="signup-container">
     <form @submit.prevent="nextStep">
+      <!-- Step 1: Full Name -->
       <div v-if="step === 1" class="form-group">
         <label class="input-label" for="fullName">{{ t.fullName }}</label>
         <div class="input-button-row">
-          <input type="text" id="fullName" v-model="fullName" ref="fullNameInput" required />
+          <input type="text" id="fullName" v-model="fullName" ref="fullNameInput" readonly required />
           <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
         </div>
         <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
       </div>
+
+      <!-- Step 2: Company Name -->
       <div v-if="step === 2" class="form-group">
         <label class="input-label" for="companyName">{{ t.companyName }}</label>
-        <input type="text" id="companyName" v-model="companyName" ref="companyNameInput" readonly required />
+        <div class="input-button-row">
+          <input type="text" id="companyName" v-model="companyName" ref="companyNameInput" readonly required />
+          <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
+        </div>
+        <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
         <div class="company-suggestions" v-if="filteredCompanies.length">
-          <div class="company-card" v-for="company in filteredCompanies" :key="company.id"
-            @click="selectCompany(company)">
+          <div class="company-card" v-for="company in filteredCompanies" :key="company.id" @click="selectCompany(company)">
             {{ company.name }}
           </div>
         </div>
-        <button class="confirm-button" type="submit" v-if="showButton">{{ step < 6 ? t.next : t.finish }}</button>
-            <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
       </div>
+
+      <!-- Step 3: Purpose of Visit -->
       <div v-if="step === 3" class="form-group">
         <label class="input-label" for="visitPurpose">{{ t.visitPurpose }}</label>
-        <input type="text" id="visitPurpose" v-model="visitPurpose" ref="visitPurposeInput" readonly required />
-        <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
-            <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
+        <div class="input-button-row">
+          <input type="text" id="visitPurpose" v-model="visitPurpose" ref="visitPurposeInput" readonly required />
+          <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
+        </div>
+        <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
+        <div class="visit-purpose-suggestions" v-if="filteredVisitPurposes.length">
+          <div
+            class="visit-purpose-card"
+            v-for="purpose in filteredVisitPurposes"
+            :key="purpose.id"
+            @click="selectVisitPurpose(purpose)"
+          >
+            {{ purpose[props.lang] }}
+          </div>
+        </div>
       </div>
+
+      <!-- Step 4: Contact Person -->
       <div v-if="step === 4" class="form-group">
         <label class="input-label" for="contactPerson">{{ t.contactPerson }}</label>
-        <input type="text" id="contactPerson" v-model="contactPerson" ref="contactPersonInput" readonly required />
-        <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
-            <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
-            <ul class="dropdown" v-if="filteredContactPersons.length">
-              <li v-for="person in filteredContactPersons" :key="person" @click="contactPerson = person">{{ person }}
-              </li>
-            </ul>
+        <div class="input-button-row">
+          <input type="text" id="contactPerson" v-model="contactPerson" ref="contactPersonInput" readonly required />
+          <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
+        </div>
+        <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" :lang="lang" />
+        <ul class="dropdown" v-if="filteredContactPersons.length">
+          <li v-for="person in filteredContactPersons" :key="person" @click="contactPerson = person">{{ person }}</li>
+        </ul>
       </div>
+
+      <!-- Step 5: GDPR Agreement -->
       <div v-if="step === 5" class="form-group">
         <label for="gdprAgreement">{{ t.gdprAgreement }}</label>
-        <ul id="gdprAgreement">
-          <li v-for="(point, index) in t.gdprPoints" :key="index">{{ point }}</li>
-        </ul>
+        <textarea id="gdprAgreement" readonly>
+          Sample GDPR rules: 
+          1. Your data will be stored securely.
+          2. Your data will not be shared with third parties.
+          3. You have the right to access and delete your data.
+        </textarea>
         <div class="gdpr-agreement">
           <input type="checkbox" id="gdprAgreementCheckbox" v-model="gdprAgreement" ref="gdprAgreementInput" required />
           <label for="gdprAgreementCheckbox">{{ t.agreeToGdpr }}</label>
         </div>
+        <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
       </div>
+
+      <!-- Step 6: Summary -->
       <div v-if="step === 6" class="form-group summary">
         <h2>{{ t.summary }}</h2>
         <p><strong>{{ t.fullName }}:</strong> {{ fullName }}</p>
@@ -198,7 +244,6 @@ const showButton = computed(() => {
         <p><strong>{{ t.summaryPinCode }}</strong> {{ pinCode }}</p>
         <p>{{ t.badgePrinting }}</p>
       </div>
-      <!-- <button type="submit">{{ step < 6 ? t.next : t.finish }}</button> -->
     </form>
   </div>
 </template>
@@ -216,21 +261,10 @@ const showButton = computed(() => {
   background-color: #2c3e50;
   border-radius: 10px;
   width: 100%;
-  /* max-width: 1000px; */
   margin: -2rem auto;
 }
 
-.confirm-button {
-  padding: 1.5rem 1.5rem;
-  font-size: 1.2rem;
-  color: #2c3e50;
-  background-color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 1rem;
-  width: 15%;
-}
+
 
 .signup-container h1 {
   font-size: 2.4rem;
@@ -243,7 +277,7 @@ const showButton = computed(() => {
   flex-direction: column;
   align-items: center;
   margin-bottom: 1rem;
-  width: 50rem;
+  width: 60rem;
 }
 
 .form-group .input-label {
@@ -322,8 +356,6 @@ button {
   margin-top: 1rem;
 }
 
-/*   */
-
 .gdpr-agreement {
   display: flex;
   align-items: center;
@@ -357,7 +389,6 @@ button {
   transition: background-color 0.2s ease;
 }
 
-/* nepotrebno jer se za sad aplikacija planira koristiti samo na tabletu */
 ::v-deep(.hg-button:hover) {
   background-color: #2c3e50;
   color: #ffffff;
@@ -373,12 +404,12 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-top: 1rem;
-  background-color: #f9f9f9;
+  margin-top: 0;
+  background-color: #2c3e50;
   padding: 1rem;
   border-radius: 5px;
-  max-height: 15em;
-  max-width: 90em;
+  max-height: 20em;
+  max-width: 100%;
   overflow-y: auto;
 }
 
@@ -402,39 +433,65 @@ button {
 .input-button-row {
   display: flex;
   flex-direction: row;
-  align-items: baseline;
-  /* Align input and button vertically */
+  align-items: end;
   gap: 1rem;
-  /* Add space between the input and button */
   width: 100%;
-  /* Ensure the row takes up the full width */
 }
 
 .input-button-row input {
   flex: 1;
-  /* Make the input take up the remaining space */
-  padding: 1rem;
-  font-size: 1.5rem;
+  padding: 0.5rem;
+  font-size: 2rem;
   font-weight: bold;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   color: black;
 }
 
 .confirm-button {
   flex-shrink: 0;
-  /* Prevent the button from shrinking */
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
+  padding: 0.9rem 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
   color: #2c3e50;
   background-color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .confirm-button:hover {
   background-color: #ddd;
+}
+
+.visit-purpose-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0;
+  background-color: #2c3e50;
+  padding: 1rem;
+  border-radius: 5px;
+  max-height: 20em;
+  max-width: 100%;
+  overflow-y: auto;
+}
+
+.visit-purpose-card {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 1rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.visit-purpose-card:hover {
+  background-color: #2c3e50;
+  color: #ffffff;
 }
 </style>
