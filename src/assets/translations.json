@@ -33,9 +33,9 @@
     "gdprAgreement": "GDPR sporazum",
     "summary": "Sažetak",
     "gdprPoints": [
-      "1. Vaši podaci će biti pohranjeni sigurno.",
-      "2. Vaši podaci neće biti dijeljeni s trećim stranama.",
-      "3. Imate pravo pristupa i brisanja svojih podataka."
+      "Vaši podaci će biti pohranjeni sigurno.",
+      "Vaši podaci neće biti dijeljeni s trećim stranama.",
+      "Imate pravo pristupa i brisanja svojih podataka."
     ],
     "agreeToGdpr": "Slažem se s GDPR pravilima",
     "next": "Dalje",
