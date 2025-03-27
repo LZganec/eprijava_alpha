@@ -4,7 +4,7 @@ import translations from '../assets/translations.json'
 import SignUp from './SignUp.vue'
 import LogIn from './LogIn.vue'
 import LogOut from './LogOut.vue'
-// import SimpleKeyboard from './SimpleKeyboard.vue'
+import registeredUsers from '../assets/registeredUsers.json'
 
 const props = defineProps({
   msg: {
@@ -18,6 +18,14 @@ const props = defineProps({
 })
 
 const currentView = ref(0) // 0: buttons, 1: SignUp, 2: LogIn, 3: LogOut
+
+const users = ref([...registeredUsers])
+
+const addUser = (newUser) => {
+  users.value.push(newUser)
+  console.log('New user added:', newUser)
+  console.log('Updated list of users:', users.value)
+}
 
 const buttonLabels = computed(() => {
   return translations[props.lang] || translations['en']
@@ -36,21 +44,6 @@ const showView = (view) => {
   currentView.value = view
 }
 
-// Virtual keyboard logic
-// const input = ref('')
-
-// const onInputChange = (event) => {
-//   input.value = event.target.value
-// }
-
-// const onChange = (inputValue) => {
-//   input.value = inputValue
-//   console.log('Input changed:', inputValue)
-// }
-
-// const onKeyPress = (key) => {
-//   console.log('Key pressed:', key)
-// }
 </script>
 
 <template>
@@ -61,13 +54,11 @@ const showView = (view) => {
       <button @click="showView(2)">{{ buttonLabels.signIn }}</button>
       <button @click="showView(3)">{{ buttonLabels.logOut }}</button>
     </div>
-    <SignUp v-else-if="currentView === 1" :lang="lang" />
+    <SignUp v-else-if="currentView === 1" :lang="lang" :addUser="addUser" />
     <LogIn v-else-if="currentView === 2" />
     <LogOut v-else-if="currentView === 3" />
   </div>
   <div id="app">
-    <!-- <input :value="input" class="input" @input="onInputChange" placeholder="Tap on the virtual keyboard to start" />
-    <SimpleKeyboard @onChange="onChange" @onKeyPress="onKeyPress" :input="input" /> -->
   </div>
 </template>
 

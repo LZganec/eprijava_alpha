@@ -6,7 +6,7 @@ import translations from './assets/translations.json' // za prijevode
 
 let time = ref('')
 let welcomeMessage = ref('')
-let currentLang = ref('hr') // Default language is Croatian
+let currentLang = ref('hr') // zadani jezik je hrvatski
 
 // funkcija za promjenu jezika
 const changeLanguage = (lang) => {

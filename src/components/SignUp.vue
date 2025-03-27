@@ -1,12 +1,11 @@
 <script setup>
 import { ref, nextTick, computed } from 'vue'
-import translations from '../assets/translations.json'
-import registeredCompanies from '../assets/registeredCompanies.json'; // importa registrirane tvrtke
-import SimpleKeyboard from './SimpleKeyboard.vue'
-import visitPurposes from '../assets/visitPurposes.json'
-import contacts from '../assets/contacts.json'; // Import contacts JSON
+import translations from '../assets/translations.json' // import prijevoda
+import registeredCompanies from '../assets/registeredCompanies.json'; // import registriranih tvrtki
+import SimpleKeyboard from './SimpleKeyboard.vue' // import virtualne tipkovnice - vanjski library
+import visitPurposes from '../assets/visitPurposes.json' // import namjene posjeta
+import contacts from '../assets/contacts.json'; // import kontakt osoba
 
-// logika za virtualnu tipkovnicu
 const input = ref('') // pratimo trenutnu vrijednost inputa
 
 const onChange = (inputValue) => {
@@ -36,7 +35,7 @@ const onChange = (inputValue) => {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       filterContactPersons(inputValue);
-    }, 1000); // 500ms debounce
+    }, 1000);
   }
 }
 
@@ -76,35 +75,43 @@ const filterContactPersons = (query) => {
 };
 
 const selectVisitPurpose = (purpose) => {
-  visitPurpose.value = purpose[props.lang] // Autofill the selected purpose
-  input.value = purpose[props.lang] // Sync with the virtual keyboard
-  filteredVisitPurposes.value = [] // Clear the filtered purposes
+  visitPurpose.value = purpose[props.lang] // automatski popuni odabranu namjenu posjeta
+  input.value = purpose[props.lang] // sinkroniziraj s virtualnom tipkovnicom
+  filteredVisitPurposes.value = [] // očisti filtrirane namjene posjeta
 }
 
 const selectCompany = (company) => {
-  companyName.value = company.name; // autofil za odabranu tvrtku
-  input.value = company.name; // sinkronizira odabranu tvrtku s virtualnom tipkovnicom
+  companyName.value = company.name; // automatski popuni za odabranu tvrtku
+  input.value = company.name; // sinkroniziraj odabranu tvrtku s virtualnom tipkovnicom
   filteredCompanies.value = []; // očisti filtrirane tvrtke
   selectedCompany.value = company; // označi odabranu tvrtku
 };
 
+const selectedContactPerson = ref(null); // pohrani odabranu kontakt osobu kao objekt
+
 const selectContactPerson = (person) => {
-  contactPerson.value = person.fullName; // Autofill the input field with the full name
-  input.value = person.fullName; // Sync with the virtual keyboard
-  filteredContactPersons.value = []; // Clear the suggestions immediately
+  contactPerson.value = person.fullName; // automatski popuni polje s punim imenom
+  input.value = person.fullName; // sinkroniziraj s virtualnom tipkovnicom
+  filteredContactPersons.value = []; // očisti prijedloge
+  selectedContactPerson.value = person; // pohrani cijeli objekt kontakt osobe
 };
 
 const gdprText = computed(() => {
-  return translations[props.lang]?.gdprPoints || translations['en'].gdprPoints; // Fallback to English if the language is not found
+  return translations[props.lang]?.gdprPoints || translations['en'].gdprPoints; // povratak na engleski ako jezik nije pronađen
 });
 
+// funkcija za obradu pritiska tipke, služi za testiranje
 const onKeyPress = (key) => {
-  console.log('Key pressed:', key)
+  // console.log('Key pressed:', key)
 }
 
 const props = defineProps({
   lang: {
     type: String,
+    required: true,
+  },
+  addUser: {
+    type: Function,
     required: true,
   },
 })
@@ -126,10 +133,14 @@ const companyNameInput = ref(null)
 const visitPurposeInput = ref(null)
 const contactPersonInput = ref(null)
 const gdprAgreementInput = ref(null)
+const skipStepTwo = ref(false)
 
 const nextStep = async () => {
   if (step.value < 6) {
     step.value++
+    if (step.value === 2 && skipStepTwo.value === true) {
+      step.value++
+    }
     if (step.value === 6) {
       generatePinCode()
     }
@@ -138,16 +149,56 @@ const nextStep = async () => {
     input.value = '' // počisti input virtualne tipkovnice nakon svakog koraka
   } else {
     handleSignUp()
+    if (additionalVisitorBool.value === true) {
+      skipStepTwo.value = true
+      step.value = 1
+      additionalVisitorBool.value = false
+    }
+    else {
+      step.value = 7
+    }
   }
 }
 
+const stepBack = async () => {
+  if (step.value > 1) {
+    step.value--
+    await nextTick()
+    focusInput()
+    input.value = '' // počisti input virtualne tipkovnice nakon svakog koraka
+  }
+}
+
+let additionalVisitorBool = ref(false);
+const setAdditionalVisitor = (bool) => {
+  additionalVisitorBool.value = bool;
+  console.log('Additional visitor:', additionalVisitorBool.value)
+  nextStep();
+}
+
 const handleSignUp = () => {
-  console.log('Full Name:', fullName.value)
-  console.log('Company Name:', companyName.value)
-  console.log('Visit Purpose:', visitPurpose.value)
-  console.log('Contact Person:', contactPerson.value)
-  console.log('GDPR Agreement:', gdprAgreement.value)
-  console.log('PIN Code:', pinCode.value)
+  const newUser = {
+    fullName: fullName.value,
+    companyName: companyName.value,
+    visitPurpose: visitPurpose.value,
+    contactPerson: contactPerson.value,
+    gdprAgreement: gdprAgreement.value,
+    pinCode: pinCode.value,
+  }
+
+  // Add the new user to the list
+  props.addUser(newUser)
+
+  console.log('New user registered:', newUser)
+
+  // Reset the form for the next user
+  step.value = 1
+  fullName.value = ''
+  // companyName.value = ''
+  visitPurpose.value = ''
+  contactPerson.value = ''
+  gdprAgreement.value = false
+  pinCode.value = ''
 }
 
 const focusInput = () => {
@@ -189,6 +240,7 @@ const t = computed(() => translations[props.lang] || translations['en'])
       <div v-if="step === 2" class="form-group">
         <label class="input-label" for="companyName">{{ t.companyName }}</label>
         <div class="input-button-row">
+          <button class="back-button" @click="stepBack">{{ t.back }}</button>
           <input type="text" id="companyName" v-model="companyName" ref="companyNameInput" readonly required />
           <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
         </div>
@@ -205,6 +257,7 @@ const t = computed(() => translations[props.lang] || translations['en'])
       <div v-if="step === 3" class="form-group">
         <label class="input-label" for="visitPurpose">{{ t.visitPurpose }}</label>
         <div class="input-button-row">
+          <button class="back-button" @click="stepBack">{{ t.back }}</button>
           <input type="text" id="visitPurpose" v-model="visitPurpose" ref="visitPurposeInput" readonly required />
           <button class="confirm-button" type="submit">{{ step < 6 ? t.next : t.finish }}</button>
         </div>
@@ -221,6 +274,7 @@ const t = computed(() => translations[props.lang] || translations['en'])
       <div v-if="step === 4" class="form-group">
         <label class="input-label" for="contactPerson">{{ t.contactPerson }}</label>
         <div class="input-button-row">
+          <button class="back-button" @click="stepBack">{{ t.back }}</button>
           <input type="text" id="contactPerson" v-model="contactPerson" ref="contactPersonInput" readonly required />
           <button class="confirm-button" type="submit">
             {{ step < 6 ? t.next : t.finish }} </button>
@@ -255,10 +309,28 @@ const t = computed(() => translations[props.lang] || translations['en'])
         <p><strong>{{ t.companyName }}:</strong> {{ companyName }}</p>
         <p><strong>{{ t.visitPurpose }}:</strong> {{ visitPurpose }}</p>
         <p><strong>{{ t.contactPerson }}:</strong> {{ contactPerson }}</p>
-        <p><strong>{{ t.summaryPinCode }}</strong> {{ pinCode }}</p>
+        <p v-if="selectedContactPerson">
+          <strong>Email:</strong> {{ selectedContactPerson.email }}
+        </p>
+        <p v-if="selectedContactPerson">
+          <strong>Phone:</strong> {{ selectedContactPerson.phone }}
+        </p>
+        <p id="pince"><strong>{{ t.summaryPinCode }}</strong> {{ pinCode }}</p>
         <p>{{ t.badgePrinting }}</p>
       </div>
     </form>
+    <div v-if="step === 6" class="additional-visitor-group">
+      <h2>{{ t.additionalVisitor }}</h2>
+      <p>{{ t.additionalVisitorPrompt }}</p>
+      <div class="avg-buttons">
+        <button @click="setAdditionalVisitor(true)">{{ t.yes }}</button>
+        <button @click="nextStep">{{ t.no }}</button>
+      </div>
+    </div>
+    <div v-if="step === 7" class="thank-you">
+      <h2>{{ t.thankYou }}</h2>
+      <p>{{ t.thankYouMessage }}</p>
+    </div>
   </div>
 </template>
 
@@ -277,8 +349,6 @@ const t = computed(() => translations[props.lang] || translations['en'])
   width: 100%;
   margin: -2rem auto;
 }
-
-
 
 .signup-container h1 {
   font-size: 2.4rem;
@@ -319,24 +389,35 @@ const t = computed(() => translations[props.lang] || translations['en'])
   color: black;
 }
 
+#pince {
+  font-weight: 900;
+}
+
+.form-group h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  margin-top: -0.75em;
+  color: white;
+}
+
 textarea {
   height: 450px;
   width: 100%;
 }
 
 .summary {
-  padding: 2rem;
-  margin-top: 5em;
+  margin-top: 0;
+  padding-top: 0;
   background-color: #1a252f;
   border-radius: 10px;
   color: white;
   width: 30em;
-  height: 20em;
+  height: 16em;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 ul {
@@ -374,7 +455,6 @@ button {
 .gdpr-agreement {
   display: flex;
   align-items: center;
-  /* justify-content: space-around; */
   margin-top: 1rem;
   margin-bottom: 5rem;
   width: 50em;
@@ -465,7 +545,7 @@ button {
   color: black;
 }
 
-.confirm-button {
+.confirm-button .back-button {
   flex-shrink: 0;
   padding: 0.9rem 2rem;
   font-size: 1.5rem;
@@ -477,6 +557,8 @@ button {
   cursor: pointer;
   transition: background-color 0.2s ease;
   width: 7em;
+  min-width: 7em;
+  max-width: 7em;
 }
 
 .confirm-button:hover {
@@ -586,5 +668,54 @@ button {
   color: white;
   width: 200%;
   position: relative;
+}
+
+.additional-visitor-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  color: white;
+}
+
+.additional-visitor-group h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0;
+}
+
+.additional-visitor-group p {
+  font-size: 2rem;
+  text-align: center;
+}
+
+.avg-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 5em;
+  margin-top: 1.5em;
+}
+
+.avg-buttons button {
+  font-size: 3em;
+  width: 5em;
+  height: 2.5em;
+}
+
+.thank-you {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  color: white;
+}
+
+.thank-you h2 {
+  font-size: 4rem;
+  margin-bottom: 0;
+}
+
+.thank-you p {
+  font-size: 3rem;
+  text-align: center;
 }
 </style>
