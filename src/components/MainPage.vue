@@ -7,11 +7,11 @@ import LogOut from './LogOut.vue'
 import registeredUsers from '../assets/registeredUsers.json'
 
 const props = defineProps({
-  msg: {
+  msg: { // naslov
     type: String,
     required: true,
   },
-  lang: {
+  lang: { // jezik
     type: String,
     required: true,
   },
@@ -19,18 +19,26 @@ const props = defineProps({
 
 const currentView = ref(0) // 0: buttons, 1: SignUp, 2: LogIn, 3: LogOut
 
+// registrirani korisnici
 const users = ref([...registeredUsers])
 
+// dodaj novog korisnika
 const addUser = (newUser) => {
   users.value.push(newUser)
   console.log('New user added:', newUser)
   console.log('Updated list of users:', users.value)
+  console.log('Online Users:', onlineUsers.value);
 }
 
-const buttonLabels = computed(() => {
+const onlineUsers = computed(() => { // prikaži samo korisnike koji su online
+  return users.value.filter(user => user.online);
+});
+
+const buttonLabels = computed(() => { // prijevod gumba
   return translations[props.lang] || translations['en']
 })
 
+// prijevod naslova
 const viewTitles = computed(() => {
   return {
     0: props.msg,
@@ -40,6 +48,7 @@ const viewTitles = computed(() => {
   }
 })
 
+// prikaži određeni view
 const showView = (view) => {
   currentView.value = view
 }
@@ -54,8 +63,8 @@ const showView = (view) => {
       <button @click="showView(2)">{{ buttonLabels.signIn }}</button>
       <button @click="showView(3)">{{ buttonLabels.logOut }}</button>
     </div>
-    <SignUp v-else-if="currentView === 1" :lang="lang" :addUser="addUser" />
-    <LogIn v-else-if="currentView === 2" />
+    <SignUp v-else-if="currentView === 1" :lang="lang" :addUser="addUser" :goToMainPage="() => showView(0)" />
+    <LogIn v-else-if="currentView === 2" :lang="lang" />
     <LogOut v-else-if="currentView === 3" />
   </div>
   <div id="app">

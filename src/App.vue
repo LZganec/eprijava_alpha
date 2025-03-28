@@ -4,13 +4,13 @@ import MainPage from './components/MainPage.vue'
 import 'flag-icons/css/flag-icons.min.css' // za ikone zastava
 import translations from './assets/translations.json' // za prijevode
 
-let time = ref('')
-let welcomeMessage = ref('')
+let time = ref('') // trenutno vrijeme
+let welcomeMessage = ref('') // poruka dobrodošlice
 let currentLang = ref('hr') // zadani jezik je hrvatski
 
 // funkcija za promjenu jezika
 const changeLanguage = (lang) => {
-  currentLang.value = lang
+  currentLang.value = lang // postavlja trenutni jezik na odabrani jezik
   // provjerava postoji li prijevod za zadani jezik u objektu translations
   if (translations[lang]) {
     // ako postoji, postavlja vrijednost welcomeMessage na prijevod za zadani jezik
@@ -21,7 +21,7 @@ const changeLanguage = (lang) => {
 
 // funkcija za ažuriranje vremena
 const updateTime = () => {
-  const now = new Date()
+  const now = new Date() // trenutni datum i vrijeme
   const hours = String(now.getHours()).padStart(2, '0')
   const minutes = String(now.getMinutes()).padStart(2, '0')
   const seconds = String(now.getSeconds()).padStart(2, '0')
@@ -30,10 +30,11 @@ const updateTime = () => {
 
 // postavlja zadani jezik na hrvatski prilikom montiranja komponente
 onMounted(() => {
-  changeLanguage('hr')
-  updateTime()
+  changeLanguage('hr') // postavlja jezik na hrvatski
+  updateTime() // postavlja trenutno vrijeme
   setInterval(updateTime, 1000) // ažurira vrijeme svake sekunde
 })
+
 </script>
 
 <template>

@@ -6,47 +6,65 @@ import SimpleKeyboard from './SimpleKeyboard.vue' // import virtualne tipkovnice
 import visitPurposes from '../assets/visitPurposes.json' // import namjene posjeta
 import contacts from '../assets/contacts.json'; // import kontakt osoba
 
-const input = ref('') // pratimo trenutnu vrijednost inputa
+// input parametri iz MainPage.vue
+const props = defineProps({
+  lang: { // trenutno odabrani jezik
+    type: String,
+    required: true,
+  },
+  addUser: { // funkcija za dodavanje novog korisnika
+    type: Function,
+    required: true,
+  },
+  goToMainPage: { // funkcija za povratak na glavnu stranicu, pozvana nakon pri završetku registracije
+    type: Function,
+    required: true,
+  },
+})
 
+const input = ref('') // za input virtualne tipkovnice
+
+// INPUT HANDLING
 const onChange = (inputValue) => {
 
   input.value = inputValue // apdejta trenutnu vrijednost inputa
 
   if (step.value === 1) {
-    fullName.value = inputValue // sinkronizira s poljem fullName
+    fullName.value = inputValue // sinkronizira s poljem fullName ako je trenutni korak 1
 
   } else if (step.value === 2) {
-    companyName.value = inputValue // sinkronizira s poljem companyName
+    companyName.value = inputValue // sinkronizira s poljem companyName ako je trenutni korak 2
 
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(() => {
-      filterCompanies(inputValue);
-    }, 1000);
+    clearTimeout(debounceTimeout); // debounce za filtriranje stavki
+    debounceTimeout = setTimeout(() => { // možda nepotrebno jer nebude puno upita odjenput
+      filterCompanies(inputValue); // ista funkcija za donje korake
+    }, 300);
   } else if (step.value === 3) {
-    visitPurpose.value = inputValue // sinkronizira s poljem visitPurpose
+    visitPurpose.value = inputValue // sinkronizira s poljem visitPurpose ako je trenutni korak 3
 
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       filterVisitPurposes(inputValue);
-    }, 1000);
+    }, 300);
   } else if (step.value === 4) {
-    contactPerson.value = inputValue // sinkronizira s poljem contactPerson
+    contactPerson.value = inputValue // sinkronizira s poljem contactPerson ako je trenutni korak 4
 
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       filterContactPersons(inputValue);
-    }, 1000);
+    }, 300);
   }
 }
 
+// FILTRIRANJE
 const filterCompanies = (query) => {
-  if (!query) {
+  if (!query) { // ako je query prazan, očisti filtrirane tvrtke
     filteredCompanies.value = [];
     return;
   }
-
-  filteredCompanies.value = registeredCompanies.filter((company) =>
-    company.name.toLowerCase().includes(query.toLowerCase())
+  // filtriraj tvrtke po imenu i spremi u filteredCompanies
+  filteredCompanies.value = registeredCompanies.filter((company) => // filteriraj tvrtke po imenu
+    company.name.toLowerCase().includes(query.toLowerCase()) // pretvori u mala slova i provjeri sadrži li query
   );
 
 };
@@ -74,6 +92,7 @@ const filterContactPersons = (query) => {
   );
 };
 
+// ODABIR
 const selectVisitPurpose = (purpose) => {
   visitPurpose.value = purpose[props.lang] // automatski popuni odabranu namjenu posjeta
   input.value = purpose[props.lang] // sinkroniziraj s virtualnom tipkovnicom
@@ -100,110 +119,112 @@ const gdprText = computed(() => {
   return translations[props.lang]?.gdprPoints || translations['en'].gdprPoints; // povratak na engleski ako jezik nije pronađen
 });
 
+// zastara, koristi se za testiranje
 // funkcija za obradu pritiska tipke, služi za testiranje
 const onKeyPress = (key) => {
   // console.log('Key pressed:', key)
 }
 
-const props = defineProps({
-  lang: {
-    type: String,
-    required: true,
-  },
-  addUser: {
-    type: Function,
-    required: true,
-  },
-})
-
-const step = ref(1)
-const fullName = ref('')
-const companyName = ref('')
-const visitPurpose = ref('')
-const contactPerson = ref('')
-const gdprAgreement = ref(false)
-const pinCode = ref('')
-const filteredContactPersons = ref([])
+// DEFINICIJE
+const step = ref(1) // trenutni korak
+const fullName = ref('') // ime i prezime
+const companyName = ref('') // naziv tvrtke
+const visitPurpose = ref('') // namjena posjeta
+const contactPerson = ref('') // kontakt osoba
+const gdprAgreement = ref(false) // suglasnost s GDPR-om
+const pinCode = ref('') // generirani pin kod
+const filteredContactPersons = ref([]) // array za filtrirane kontakt osobe
 const filteredCompanies = ref([]); // array za filtrirane tvrtke
 const selectedCompany = ref(null); // trenutno odabrana tvrtka
-const filteredVisitPurposes = ref([])
-let debounceTimeout
-const fullNameInput = ref(null)
-const companyNameInput = ref(null)
-const visitPurposeInput = ref(null)
-const contactPersonInput = ref(null)
-const gdprAgreementInput = ref(null)
-const skipStepTwo = ref(false)
+const filteredVisitPurposes = ref([]) // array za filtrirane namjene posjeta
+const fullNameInput = ref(null) // referenca na input za ime i prezime
+const companyNameInput = ref(null) // referenca na input za naziv tvrtke
+const visitPurposeInput = ref(null) // referenca na input za namjenu posjeta
+const contactPersonInput = ref(null)// referenca na input za kontakt osobu
+const gdprAgreementInput = ref(null) // referenca na input za suglasnost s GDPR-om
+const skipStepTwo = ref(false) // preskoči korak 2 ako je u pitanju dodatan gost iz iste tvrtke
+let debounceTimeout // debounce timeout za filtriranje
 
-const nextStep = async () => {
-  if (step.value < 6) {
-    step.value++
-    if (step.value === 2 && skipStepTwo.value === true) {
+// APP FLOW
+const nextStep = async () => { // funkcija za sljedeći korak
+  if (step.value < 6) { // ako nije zadnji korak
+    step.value++ // povećaj korak
+    if (step.value === 2 && skipStepTwo.value === true) { // preskoči korak 2 ako je u pitanju dodatan gost iz iste tvrtke
       step.value++
     }
-    if (step.value === 6) {
+    if (step.value === 6) { // ako je korak 6, generiraj pin kod
       generatePinCode()
     }
-    await nextTick()
-    focusInput()
+    await nextTick() // pričekaj da se DOM ažurira
+    focusInput() // fokusiraj input
     input.value = '' // počisti input virtualne tipkovnice nakon svakog koraka
   } else {
-    handleSignUp()
-    if (additionalVisitorBool.value === true) {
+    handleSignUp() // završi registraciju
+    if (additionalVisitorBool.value === true) { // ako je dodatan gost, vrati se na korak 1
       skipStepTwo.value = true
       step.value = 1
-      additionalVisitorBool.value = false
+      additionalVisitorBool.value = false // resetiraj dodatnog gosta, u slučaju dodatnog dodatnog gosta
     }
     else {
-      step.value = 7
+      step.value = 7 // ako nije dodatan gost, završi registraciju
+      companyName.value = '' // resetiraj naziv tvrtke
+      setTimeout(() => { // pričekaj 5 sekundi
+        props.goToMainPage(); // vrati se na glavnu stranicu
+      }, 5000);
     }
   }
 }
 
+// funkcija za korak unatrag
 const stepBack = async () => {
-  if (step.value > 1) {
-    step.value--
-    await nextTick()
-    focusInput()
+  if (step.value > 1) { // ako nije prvi korak
+    step.value-- // smanji korak
+    await nextTick() // pričekaj da se DOM ažurira
+    focusInput() // fokusiraj input
     input.value = '' // počisti input virtualne tipkovnice nakon svakog koraka
   }
 }
 
+// postavljanje dodatnog gosta
 let additionalVisitorBool = ref(false);
-const setAdditionalVisitor = (bool) => {
-  additionalVisitorBool.value = bool;
-  console.log('Additional visitor:', additionalVisitorBool.value)
-  nextStep();
+const setAdditionalVisitor = (bool) => { // postavi dodatnog gosta
+  additionalVisitorBool.value = bool; // postavi vrijednost
+  console.log('Additional visitor:', additionalVisitorBool.value) // ispiši u konzolu
+  nextStep(); // idi na sljedeći korak
 }
 
+// registracija novog korisnika
 const handleSignUp = () => {
-  const newUser = {
-    fullName: fullName.value,
-    companyName: companyName.value,
-    visitPurpose: visitPurpose.value,
-    contactPerson: contactPerson.value,
-    gdprAgreement: gdprAgreement.value,
-    pinCode: pinCode.value,
+  const newUser = { // novi korisnik
+    fullName: fullName.value, // ime i prezime
+    companyName: companyName.value, // naziv tvrtke
+    visitPurpose: visitPurpose.value, // namjena posjeta
+    contactPerson: contactPerson.value, // kontakt osoba
+    gdprAgreement: gdprAgreement.value, // suglasnost s GDPR-om
+    pinCode: pinCode.value, // pin kod
+    online: true, // online status
   }
 
-  // Add the new user to the list
+  // dodaj novog korisnika
   props.addUser(newUser)
 
+  // ispiši novog korisnika u konzolu
   console.log('New user registered:', newUser)
 
   // Reset the form for the next user
   step.value = 1
   fullName.value = ''
-  // companyName.value = ''
+  // companyName.value ne resetiramo jer je sljedeći korisnik iz iste tvrtke
   visitPurpose.value = ''
   contactPerson.value = ''
   gdprAgreement.value = false
   pinCode.value = ''
 }
 
+// fokusiraj input
 const focusInput = () => {
-  if (step.value === 1 && fullNameInput.value) {
-    fullNameInput.value.focus()
+  if (step.value === 1 && fullNameInput.value) { // ako je korak 1 i postoji input za ime i prezime
+    fullNameInput.value.focus() // fokusiraj input
   } else if (step.value === 2 && companyNameInput.value) {
     companyNameInput.value.focus()
   } else if (step.value === 3 && visitPurposeInput.value) {
@@ -215,11 +236,13 @@ const focusInput = () => {
   }
 }
 
+// generiranje pin koda
 const generatePinCode = () => {
-  pinCode.value = Math.floor(10000 + Math.random() * 90000).toString()
+  pinCode.value = Math.floor(10000 + Math.random() * 90000).toString() // generiraj random broj od 10000 do 99999
 }
 
-const t = computed(() => translations[props.lang] || translations['en'])
+// prijevodi
+const t = computed(() => translations[props.lang] || translations['en']) // dohvati prijevod ili vrati engleski ako nije pronađen
 
 </script>
 
@@ -313,7 +336,7 @@ const t = computed(() => translations[props.lang] || translations['en'])
           <strong>Email:</strong> {{ selectedContactPerson.email }}
         </p>
         <p v-if="selectedContactPerson">
-          <strong>Phone:</strong> {{ selectedContactPerson.phone }}
+          <strong>Mob:</strong> {{ selectedContactPerson.phone }}
         </p>
         <p id="pince"><strong>{{ t.summaryPinCode }}</strong> {{ pinCode }}</p>
         <p>{{ t.badgePrinting }}</p>
@@ -327,6 +350,8 @@ const t = computed(() => translations[props.lang] || translations['en'])
         <button @click="nextStep">{{ t.no }}</button>
       </div>
     </div>
+
+    <!-- Step 7: Thank you -->
     <div v-if="step === 7" class="thank-you">
       <h2>{{ t.thankYou }}</h2>
       <p>{{ t.thankYouMessage }}</p>

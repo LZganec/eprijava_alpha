@@ -6,7 +6,8 @@
     "contactPerson": "Jane Smith",
     "gdprAgreement": true,
     "pinCode": "1234",
-    "defaultLanguage": "en"
+    "defaultLanguage": "en",
+    "online": false
   },
   {
     "fullName": "Joža Krampus",
@@ -15,7 +16,8 @@
     "contactPerson": "Phillip Hoffmann",
     "gdprAgreement": true,
     "pinCode": "5678",
-    "defaultLanguage": "hr"
+    "defaultLanguage": "hr",
+    "online": true
   },
   {
     "fullName": "Max Mustermann",
@@ -24,7 +26,8 @@
     "contactPerson": "Anna Müller",
     "gdprAgreement": true,
     "pinCode": "9101",
-    "defaultLanguage": "de"
+    "defaultLanguage": "de",
+    "online": true
   },
   {
     "fullName": "Jean Dupont",
@@ -33,7 +36,8 @@
     "contactPerson": "Marie Curie",
     "gdprAgreement": true,
     "pinCode": "1122",
-    "defaultLanguage": "fr"
+    "defaultLanguage": "fr",
+    "online": false
   },
   {
     "fullName": "Giovanni Rossi",
@@ -42,6 +46,7 @@
     "contactPerson": "Luca Bianchi",
     "gdprAgreement": true,
     "pinCode": "3344",
-    "defaultLanguage": "it"
+    "defaultLanguage": "it",
+    "online": false
   }
 ]
